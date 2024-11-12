@@ -19,7 +19,7 @@ Ensure Docker is running on your machine before attempting to build and run the 
 
 To build the application, use the following command:
 
-         docker build --build-arg JAR_FILE=build/libs/ReceiptProcessor-0.0.1-SNAPSHOT.jar -t receiptprocessor-0.0.1 .
+         docker build --build-arg JAR_FILE=JarFile/ReceiptProcessor-0.0.1-SNAPSHOT.jar -t receiptprocessor-0.0.1 .
 
 ## Running the Project
 
