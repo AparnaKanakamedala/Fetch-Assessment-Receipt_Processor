@@ -1,0 +1,72 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.5'
+	id 'io.spring.dependency-management' version '1.1.6'
+	// id "com.palantir.docker" version "0.36.0"
+}
+
+group = 'com.fetch'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(19)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+// //Define Docker image properties
+// docker {
+//     name "${project.group}/${project.name}:${project.version}"
+//     // tags = ['latest', '${project.version}'] // Add any additional tags as needed
+//     files 'Dockerfile', 'build/libs' // Include Dockerfile and the jar files for the build context
+//     buildArgs(['JAR_FILE': "build/libs/${project.name}-${project.version}.jar"])
+// }
+
+// // Task to build the Docker image
+// task buildDockerImage(type: Exec) {
+//     dependsOn build // Ensure the project is built first
+//     // tags = ['latest'] // Tag your image
+//     buildArgs = ['JAR_FILE': "build/libs/${project.name}-${project.version}.jar"]
+// }
+
+// // Task to run the Docker container
+// task runDockerContainer(type: Exec) {
+//     dependsOn buildDockerImage // Ensure the Docker image is built first
+//     commandLine 'docker', 'run', '--rm', '-p', '8080:8080', 'your-docker-image-name:latest'
+// }
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.networknt:json-schema-validator:1.4.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+task buildDockerImage(type: Exec) {
+	dependsOn build
+    group = "Docker"
+    description = "Builds the Docker image and runs the container with specified configurations."
+
+    // Step: Build the Docker image
+    doFirst {
+        // commandLine './gradlew', 'bootBuildImage', '--imageName=sReceiptProcessor-0.0.1-SNAPSHOT'
+		commandLine 'docker', 'build', '--build-arg', 'JAR_FILE=build/libs/ReceiptProcessor-0.0.1-SNAPSHOT.jar', '-t','receiptprocessor-0.0.1', '.'
+		// docker build --build-arg JAR_FILE=build/libs/\*.jar -t springio/gs-spring-boot-docker .
+    }
+}
+
+task runDocker(type: Exec) {
+	dependsOn buildDockerImage
+	group = "Docker"
+	
+	// Step: Run the Docker container
+    commandLine 'docker', 'run', '-p', '8080:8080', 'receiptprocessor-0.0.1'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
